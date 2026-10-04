@@ -1,0 +1,120 @@
+HEK293 REPORTER ASSAY: FLEXIBLE PLATE PARSER + PLOTS
+====================================================
+
+What this folder does
+---------------------
+A simple, general pipeline for HEK293 reporter-cell assays read on a plate
+reader (absorbance OR fluorescence). You describe your 96-well plate once,
+paste the reader's numbers into Excel, and get:
+  1. a tidy CSV of every well, with fold change over the negative control
+  2. a PDF of graphs + stats tables
+One plate = one cell line, one timepoint. Several plates (experiments) can be
+run together and are combined automatically.
+
+  Parse_Flex_NB.py    plate(s) -> tidy CSV          (plate map lives here)
+  HEK293_flex_NB.py   tidy CSV -> graphs + tables   (stats switches live here)
+Keep both scripts in the same folder: the plotting script reads the
+Pool/Match control settings from Parse_Flex_NB.py.
+
+
+Step 1: paste your plate into Excel
+-----------------------------------
+Copy ONE 8 x 12 block of readings from your plate-reader software into an
+Excel (or CSV) file, one plate per file. Proprietary files (e.g. .pda) are
+not read; export or copy the numbers out first.
+  - The first numeric cell is read as well A1.
+  - Reading goes right until the first blank cell and down until the first
+    blank row, so do not leave blanks inside the block. Put an x in any
+    well you want ignored (e.g. a pipetting mistake).
+  - Labels are fine only if they start with # (e.g. #A, #1, # my notes);
+    anything else would be read as data.
+  - If the reader gives two wavelengths side by side, paste only the one you
+    want (or leave a blank column between them; reading stops there).
+For several experiments, name the files ..._Exp1.xlsx, ..._Exp2.xlsx, ...
+and put them in one folder. The ExpN part becomes the Experiment label.
+
+
+Step 2: describe the plate (top of Parse_Flex_NB.py)
+----------------------------------------------------
+Names_On = "Columns" (names across Col_1..Col_12, doses down Row_A..Row_H)
+        or "Rows"    (the other way round).
+Col_1 ... Col_12 / Row_A ... Row_H: a name or a dose for each, "x" = skip.
+  Wells that share a name and dose are replicates, wherever they sit.
+  The only names that must be spelled exactly:
+      Positive_Control     Negative_Control
+  Other names can be split into two parts at the FIRST underscore,
+  Test_Sub, e.g. 1588_0.65 (strain 1588, Rf 0.65) or Fruit_Apples.
+  The graph groups each Test under a bracket with its Sub values as ticks.
+  A name with no underscore gets a single tick.
+  Doses are written like "10 ug/ml"; the number is used for sorting.
+
+Negative control (fold change = well / geometric mean of Negative_Control):
+  Pool_Negative_Control = True     all Negative_Control wells on the plate
+  Match_Negative_Control = True    only the Negative_Control at the same dose
+Positive control (used for the red stats):
+  Pool_Positive_Control = True     all Positive_Control wells are ONE group
+                                   (e.g. a saturating dose just to show the
+                                   assay worked), compared with every dose
+  Pool_Positive_Control_Dose = "1 ug/ml"   optional label for that group
+                                   (otherwise it is labelled "pooled")
+  Match_Positive_Control = True    a positive-control dose response,
+                                   compared dose by dose
+Set exactly one of each Pool/Match pair (comment the other out with #).
+
+Ignore_Wells = ["B2", "D8"]                 skip these wells on every plate
+Ignore_Experiment_Wells = ["A1_Exp2"]       skip a well on one plate only
+
+
+Step 3: run
+-----------
+    python Parse_Flex_NB.py my_plates_folder
+        -> one <file>_tidy.csv per plate + combined_tidy.csv (in that folder)
+    python Parse_Flex_NB.py one_plate_Exp1.xlsx
+        -> one_plate_Exp1_tidy.csv
+    python HEK293_flex_NB.py combined_tidy.csv
+        -> HEK293_flex_<timestamp>.pdf (in the current folder)
+
+Tidy CSV columns: Experiment, File, Well, Name, Strain, Rf, Dose, DoseValue,
+DoseUnit, Signal, Replicate, FoldChange. (Strain/Rf are the Test/Sub parts
+of the name; the graphs and tables call them Test and Sub.)
+
+
+The PDF
+-------
+Page 1: all experiments together. Each experiment is averaged first, so a
+        point = one experiment and n = number of experiments.
+Then one page per experiment (point = one well, n = wells).
+Each graph is followed by a table page.
+
+Graph: log2 fold change (axis adjusts to the data, labelled in plain fold
+change). Positive control on the left of an axis break (a bar-shaped mean
+when pooled); Negative_Control is not drawn (it is 1 by definition).
+All doses on one plot, one marker shape per dose. Big marker = geometric
+mean +/- geometric SEM. Tests and Subs are ordered numbers first, then
+names. X labels angle themselves only if they would overlap.
+
+Table: Test | Sub | Dose | N | Neg_ctrl | Pos_ctrl, Positive_Control first.
+The Neg_ctrl / Pos_ctrl columns hold the P value (+ stars) and appear only
+when that stats switch is on. "n < 3" = too few to test.
+
+
+Stats (switches at the top of HEK293_flex_NB.py; # = off)
+---------------------------------------------------------
+  Stats_vs_Negative = True     gray stars, block above the graph (default on)
+  Stats_vs_Positive = True     red stars, block above the gray
+  Each star block has one thin line per dose (highest dose on top, marked by
+  that dose's marker shape on the left), so stars never overlap.
+  Stats_Within_Strain = True   blue bars + stars between the Subs of a Test
+All on log2 fold change, per dose, groups need n >= 3.
+  gray / red: Dunnett's test (each group vs the control; fixed random seed
+              so P values are identical every run)
+  blue:       one-way ANOVA, then Tukey HSD if ANOVA P < 0.05
+Stars: * P<0.05, ** P<0.01, *** P<0.001. Non-significant = blank.
+
+
+Example data
+------------
+Example_Data/ holds four made-up plates (..._Exp1 to _Exp4) that match the
+plate map currently in Parse_Flex_NB.py. Exp1 has a few x wells. Run:
+    python Parse_Flex_NB.py Example_Data
+    python HEK293_flex_NB.py Example_Data/combined_tidy.csv

@@ -1,0 +1,56 @@
+HEK293 TLR REPORTER: LIPID A PREPARATION vs ITS Rf FRACTIONS
+============================================================
+
+What this folder does
+---------------------
+Compares one lipid A preparation as a whole ("mix", unfractionated)
+against its individual Rf-band fractions in the HEK293 TLR4/MD-2 reporter
+assay, in human and mouse reporter lines, at more than one timepoint
+(e.g. 48 h and 72 h). Unlike ../HEK293_TLR_dose, the input here is raw
+absorbance and the scripts calculate fold change themselves.
+
+
+Scripts (run in this order)
+---------------------------
+1. parse_HEK293_mix_vs_purified_GitHub.py
+   Plate-reader Excel export -> tidy table HEK293_mix_vs_purified_tidy.csv with
+   columns Time, Species, Plate, Wavelength, Strain, Rf, Dose, Replicate,
+   Absorbance (one row per well).
+
+   Expected sheet layout (first sheet, no header row):
+     column C  block label, e.g. "48H_1587_ole_mouse_620nm"
+               (time "48H", species mouse|human, wavelength "620nm",
+                optional plate "p1")
+     columns D onward, same row: well labels, e.g.
+               1587_mix  1587_68  1587_80  1587_86  pos_ctrl  neg_ctrl
+               (<strain>_<Rf x 100 or "mix">, optional dose "1ug"/"10ug")
+     rows below: one replicate per row, absorbance values
+     an empty column-C row ends the block; stack as many blocks as needed.
+
+2. HEK293_mix_vs_purified_GitHub.py
+   Tidy table -> timestamped multi-page PDF:
+     all strains per species x timepoint (mix vs each Rf band), and
+     human vs mouse per strain at each timepoint.
+
+Fold change: each well's absorbance / geometric mean of the "Neg"
+(neg_ctrl) wells with the same Species x Time (x Plate).
+Plots: points = replicate wells on a log2 axis (fold-change tick labels);
+marker = geometric mean +/- geometric SEM.
+Stats: one-way ANOVA + Tukey HSD on log2 fold change (mix vs each Rf band;
+human vs mouse). Stars (Tukey-adjusted): * P<0.05, ** P<0.01, *** P<0.001.
+
+
+Usage
+-----
+    python parse_HEK293_mix_vs_purified_GitHub.py your_plate_export.xlsx
+        -> HEK293_mix_vs_purified_tidy.csv (+ .txt copy for reading)
+    python HEK293_mix_vs_purified_GitHub.py HEK293_mix_vs_purified_tidy.csv
+        -> HEK293_mix_vs_purified_<timestamp>.pdf
+
+
+What to change for your own data (marked "EDIT FOR YOUR DATA" in the code)
+--------------------------------------------------------------------------
+- Strain IDs, positive-control label and colors (Constants block of
+  HEK293_mix_vs_purified_GitHub.py).
+- XPOS_RF / RF_BAND_KEYS_STR / X_TICK_LABELS: the Rf bands of YOUR
+  preparation and their x positions (the script hard-codes three bands).

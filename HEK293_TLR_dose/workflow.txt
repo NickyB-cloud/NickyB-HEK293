@@ -1,0 +1,69 @@
+HEK293 TLR REPORTER: DOSE-RESPONSE FIGURES
+==========================================
+
+What this folder does
+---------------------
+Plots HEK293 TLR4/MD-2 reporter cell (NF-kB -> secreted alkaline
+phosphatase, read by absorbance) responses to purified lipid A fractions
+from several bacterial strains, separated by thin-layer chromatography Rf
+band, at two doses, in human and mouse TLR4 reporter lines.
+
+
+Input: a tidy table made BY HAND
+--------------------------------
+In the original workflow the tidy table was typed/assembled by hand in a
+spreadsheet from the plate-reader output and saved as CSV (no parsing
+script). Make yours with exactly these columns, one row per replicate well:
+
+  Species     human | mouse           (which reporter cell line)
+  Wavelength  e.g. 620                (absorbance read wavelength, nm)
+  Strain      strain ID, e.g. 381, 1587, 1773; positive control = Pos_cont.
+  Rf          Rf band of the fraction, e.g. 0.68 (blank for Pos_cont.)
+  Dose        1ug | 10ug              (per mL; blank is read as 1ug)
+  Replicate   1, 2, 3 ...
+  FoldChange  the well's absorbance relative to the unstimulated
+              (negative-control) wells of the same plate, calculated in the
+              spreadsheet (the scripts do not recalculate it)
+
+Example rows:
+  Species,Wavelength,Strain,Rf,Dose,Replicate,FoldChange
+  mouse,620,1587,0.68,10ug,1,3.19
+  human,620,Pos_cont.,,1ug,1,20.4
+
+Rf values are grouped per strain after rounding to 2 decimals, so 0.757
+and 0.76 land on the same band.
+
+
+Scripts
+-------
+HEK293_figures_stacked_GitHub.py   the composite figures (2-page PDF)
+    Figure 1: all strains per species, human panel above mouse panel.
+    Figure 2: human vs mouse, one panel per strain.
+HEK293_exploratory_GitHub.py       exploratory multi-page PDF with the same
+    data plotted three ways (all strains per species; human vs mouse per
+    strain; x-axis grouped by strain then Rf).
+
+Both: points = replicate wells on a log2 axis (tick labels in fold
+change); marker = geometric mean +/- geometric SEM; positive control
+drawn to the left of an axis break.
+Stats: one-way ANOVA + Tukey HSD on log2 fold change (between Rf bands
+within a strain; human vs mouse within strain x Rf).
+Stars (Tukey-adjusted): * P<0.05, ** P<0.01, *** P<0.001.
+
+
+Usage
+-----
+    python HEK293_figures_stacked_GitHub.py HEK_tidy_dose.csv
+        -> HEK293_figures_stacked.pdf
+    python HEK293_exploratory_GitHub.py HEK_tidy_dose.csv
+        -> HEK293_exploratory_<timestamp>.pdf
+(Without an argument both scripts look for HEK_tidy_dose.csv in the
+current folder.)
+
+
+What to change for your own data (marked "EDIT FOR YOUR DATA" in the code)
+--------------------------------------------------------------------------
+- Strain IDs (PGIN_STRAINS / ECOLI_STRAINS), positive-control label,
+  dose labels and colors in the Constants block.
+- y-axis range (LOG2_YTICKS_LINEAR / LOG2_YLIM) if your responses go
+  above 64-fold.
