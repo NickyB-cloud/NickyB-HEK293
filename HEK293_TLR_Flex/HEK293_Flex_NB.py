@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-HEK293_flex_NB.py
+HEK293_Flex_NB.py
 Plots the tidy table made by Parse_Flex_NB.py (HEK293 reporter cells,
 absorbance or fluorescence, fold change over the Negative_Control).
 
 Usage:
-    python HEK293_flex_NB.py combined_tidy.csv
-Output: HEK293_flex_<timestamp>.pdf
+    python HEK293_Flex_NB.py combined_tidy.csv
+Output: HEK293_Flex_<timestamp>.pdf
     all experiments together (points = experiment means), then its table
     one graph per experiment (points = wells), each followed by its table
     Tables: one row per sample x dose with N and the P value (+ stars) vs
@@ -608,7 +608,7 @@ def main():
 
     exps = sorted(df["Experiment"].unique(), key=sort_key)
     n_x  = len(build_xaxis(df)[1])
-    out  = f"HEK293_flex_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    out  = f"HEK293_Flex_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
 
     with PdfPages(out) as pdf:
         # Page 1: all experiments, each experiment averaged first (n = experiments)

@@ -21,7 +21,7 @@ University Tisch Library by searching:
 
 I also recognize that those scripts are fragile and specific to my own
 experiments, so I troubleshot with Claude Code to make a hardened, more
-general pipeline (HEK293_TLR_flex/). I stress tested it on made-up data,
+general pipeline (HEK293_TLR_Flex/). I stress tested it on made-up data,
 which comes alongside it in an Example_Data folder. If you follow
 workflow.txt you should be able to recreate the example.pdf that comes
 along with it.
@@ -36,7 +36,7 @@ HEK293_TLR_compare/   One lipid A preparation (unfractionated "mix") vs its
                       TLC-purified Rf fractions, over timepoints; includes a
                       parser for the plate-reader Excel export.
 
-HEK293_TLR_flex/      General version for any HEK293 reporter assay
+HEK293_TLR_Flex/      General version for any HEK293 reporter assay
                       (absorbance or fluorescence): set up your plate map
                       once, paste the reader output into Excel, and get a
                       tidy table plus graphs and stats tables.
@@ -51,7 +51,7 @@ Each folder contains
 
   *.py               the scripts
 
-HEK293_TLR_flex/ also has Example_Data/ (four made-up plates and the
+HEK293_TLR_Flex/ also has Example_Data/ (four made-up plates and the
 example.pdf made from them). No real data files are included.
 
 
@@ -59,15 +59,15 @@ Getting started
 ---------------
 Python 3.14 was used. For any folder:
 
-    cd HEK293_TLR_flex             (for example)
+    cd HEK293_TLR_Flex             (for example)
     python3 -m venv venv
     venv/bin/pip install -r requirements.txt
 
-Then follow that folder's workflow.txt. To try the flex pipeline on the
+Then follow that folder's workflow.txt. To try the Flex pipeline on the
 example plates:
 
     venv/bin/python Parse_Flex_NB.py Example_Data
-    venv/bin/python HEK293_flex_NB.py Example_Data/combined_tidy.csv
+    venv/bin/python HEK293_Flex_NB.py Example_Data/combined_tidy.csv
 
 
 License

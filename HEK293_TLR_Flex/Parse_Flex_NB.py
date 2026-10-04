@@ -1,6 +1,6 @@
 """
 The goal of this script is to have you set up your plate map once, copy paste the output of the absorbance reader into an excel file, and then run this script to get a tidy long table of the data. 
-The output will be a csv file that can be used for HEK293_flex_NB.py or any other analysis script.
+The output will be a csv file that can be used for HEK293_Flex_NB.py or any other analysis script.
 If you copy and paste the output of the absorbance reader into an excel it will treat the cell with the first numeric value as A1, and stop at the first blank cell
 Which means that if you have a blank cell in the middle of your data it will not read the rest of the data. So make sure to fill in all cells with either a value or an "x" to ignore that well.
 Also, don't label the columns and rows unless there is a # in front of it. Otherwise it will read the label as a value and throw off the data.

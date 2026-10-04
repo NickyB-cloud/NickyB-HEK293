@@ -12,7 +12,7 @@ One plate = one cell line, one timepoint. Several plates (experiments) can be
 run together and are combined automatically.
 
   Parse_Flex_NB.py    plate(s) -> tidy CSV          (plate map lives here)
-  HEK293_flex_NB.py   tidy CSV -> graphs + tables   (stats switches live here)
+  HEK293_Flex_NB.py   tidy CSV -> graphs + tables   (stats switches live here)
 Keep both scripts in the same folder: the plotting script reads the
 Pool/Match control settings from Parse_Flex_NB.py.
 
@@ -71,8 +71,8 @@ Step 3: run
         -> one <file>_tidy.csv per plate + combined_tidy.csv (in that folder)
     python Parse_Flex_NB.py one_plate_Exp1.xlsx
         -> one_plate_Exp1_tidy.csv
-    python HEK293_flex_NB.py combined_tidy.csv
-        -> HEK293_flex_<timestamp>.pdf (in the current folder)
+    python HEK293_Flex_NB.py combined_tidy.csv
+        -> HEK293_Flex_<timestamp>.pdf (in the current folder)
 
 Tidy CSV columns: Experiment, File, Well, Name, Strain, Rf, Dose, DoseValue,
 DoseUnit, Signal, Replicate, FoldChange. (Strain/Rf are the Test/Sub parts
@@ -98,7 +98,7 @@ The Neg_ctrl / Pos_ctrl columns hold the P value (+ stars) and appear only
 when that stats switch is on. "n < 3" = too few to test.
 
 
-Stats (switches at the top of HEK293_flex_NB.py; # = off)
+Stats (switches at the top of HEK293_Flex_NB.py; # = off)
 ---------------------------------------------------------
   Stats_vs_Negative = True     gray stars, block above the graph (default on)
   Stats_vs_Positive = True     red stars, block above the gray
@@ -117,4 +117,4 @@ Example data
 Example_Data/ holds four made-up plates (..._Exp1 to _Exp4) that match the
 plate map currently in Parse_Flex_NB.py. Exp1 has a few x wells. Run:
     python Parse_Flex_NB.py Example_Data
-    python HEK293_flex_NB.py Example_Data/combined_tidy.csv
+    python HEK293_Flex_NB.py Example_Data/combined_tidy.csv
